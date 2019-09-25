@@ -14,21 +14,17 @@ def learning(attributes, examples, parent_examples, level):
         exs = copy.deepcopy(examples)
         a = attributes[max_key]
         attrs = copy.deepcopy(attributes)
-
         for attribute_item in set(a):
             indexes_to_delete = []
             for i in range(0, len(a)):
                 if a[i] != attribute_item:
                     indexes_to_delete.append(i)
-
             indexes_to_delete.sort(reverse=True)
-
             for index in indexes_to_delete:
                 del exs[index]
                 for attr_key in attrs:
                     del attrs[attr_key][index]
-
-            del attrs[max_key]  # TODO
+            del attrs[max_key]
             root = create_sub_tree_entry(root, learning(attrs, exs, examples, level+1))
             exs = copy.deepcopy(examples)
             attrs = copy.deepcopy(attributes)
@@ -58,7 +54,6 @@ def create_sub_tree_entry(root, entries):
             expanded_root[entry_key] = [expanded_root[entry_key], entries[entry_key]]
         else:
             expanded_root[entry_key] = entries[entry_key]
-
     return expanded_root
 
 def argmax(attributes, examples):
@@ -71,9 +66,8 @@ def argmax(attributes, examples):
             imp_key = key
     return imp_key
 
-
-# a = "sunny, sunny, rainy, sunny, sunny"
-# examples = "1, 1, 0, 1, 0"
+# a = "[sunny, sunny, rainy, sunny, sunny]"
+# examples = "[1, 1, 0, 1, 0]"
 def importance(a, examples):
     attribute_dict = {}
     for i in range(0, len(a)):
@@ -85,20 +79,14 @@ def importance(a, examples):
             attribute_dict[a[i]][1] += 1
     return information_gane(examples, attribute_dict)
 
-
 def information_gane(examples, rem_data):
     d_chance = (examples.count(1) / len(examples))
     h_d = H(d_chance)
-
-
     for key, value in rem_data.items():
         rem_chance = value[1] / value[0]
         rem_factor = value[0]/ len(examples)
-
         if (rem_chance != 0) and (rem_chance!= 1):
-
             h_d = h_d - rem_factor*H(rem_chance)
-
     return h_d
 
 def H(chance):
@@ -109,18 +97,15 @@ def pretty_print(tree):
     longest_string = 0
     all_strings = []
     indentations = 0
-
     for level in tree:
         level_string = None
         if level == 0:
             level_string = 'root:   '
         else:
             level_string = 'level ' + str(level) + ':'
-
         root_strings = [level_string]
         sub_strings = ['actions:']
         indentations += 1
-
         for entry in tree[level]:
             if type(entry) is str:
                 entry = tree[level]
@@ -138,7 +123,6 @@ def pretty_print(tree):
         all_strings.append(root_strings)
         if(sub_strings.count(None) < len(sub_strings) -1):
             all_strings.append(sub_strings)
-
     empty_places = []
     for j in range(len(all_strings)):
         print("")
@@ -155,24 +139,17 @@ def pretty_print(tree):
                 all_strings[j][i] = "".ljust(longest_string)
                 if i not in empty_places:
                     empty_places.append(i)
-
             print(all_strings[j][i], end="    ")
 
-
 if __name__ == '__main__':
-
     attributes = {'sky': ['sunny', 'sunny', 'rainy', 'sunny', 'sunny', 'rainy'],
                   'air': ['warm', 'warm', 'warm', 'warm', 'warm', 'warm'],
                   'humid': ['normal', 'high', 'high', 'high', 'normal', 'high'],
                   'wind': ['strong', 'strong', 'strong', 'strong', 'weak', 'strong'],
                   'water': ['warm', 'warm',  'warm',  'cool',  'warm', 'warm'],
                   'forecast': ['same', 'same',  'change',  'change',  'same', 'change']}
-
     examples = [1, 1, 0, 1, 0, 0]
-
     tree = learning(attributes, examples, [], 0)
-
     print('unformatted tree :', tree)
-
     pretty_print(tree)
 
